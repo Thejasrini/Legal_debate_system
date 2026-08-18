@@ -6,6 +6,13 @@ import JudgeCard from "../components/JudgeCard";
 import { streamDebate } from "../services/api";
 
 export default function Home() {
+  // Theme Preference State (dark | light)
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem("lexagent-theme");
+    if (saved) return saved;
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  });
+
   const [threadId, setThreadId] = useState(null);
   const [caseNumber, setCaseNumber] = useState("CPA/2019/0847");
   const [currentTime, setCurrentTime] = useState("");
@@ -27,6 +34,16 @@ export default function Home() {
   const [judgeLoading, setJudgeLoading] = useState(false);
 
   const [error, setError] = useState(null);
+
+  // Apply Theme Preference to DOM root attribute
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("lexagent-theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
 
   // Live Monospace Clock Effect
   useEffect(() => {
@@ -184,10 +201,16 @@ export default function Home() {
           {getStatusPill()}
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
           <span className="font-mono text-muted" style={{ fontSize: "0.78rem" }}>
             {currentTime}
           </span>
+
+          {/* Theme Preference Toggle */}
+          <button className="btn-theme-toggle" onClick={toggleTheme} title="Switch UI Theme Preference">
+            {theme === "dark" ? "☀️ Light Theme" : "🌙 Dark Theme"}
+          </button>
+
           {threadId && (
             <button className="btn-outline-brass" onClick={handleStartNewCase}>
               ➕ Start New Case
@@ -223,7 +246,7 @@ export default function Home() {
 
         {/* Error Notification */}
         {error && (
-          <div style={{ padding: "16px", backgroundColor: "var(--courtroom-red-bg)", border: "1px solid var(--courtroom-red)", color: "#F87171", borderRadius: "6px", marginBottom: "24px" }}>
+          <div style={{ padding: "16px", backgroundColor: "var(--courtroom-red-bg)", border: "1px solid var(--courtroom-red)", color: "var(--courtroom-red-bright)", borderRadius: "6px", marginBottom: "24px" }}>
             ⚠️ <strong>Filing Error:</strong> {error}
           </div>
         )}
@@ -233,7 +256,7 @@ export default function Home() {
           <div className="docket-card" style={{ borderLeft: "4px solid var(--courtroom-red)", marginBottom: "30px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
               <span style={{ fontSize: "1.5rem" }}>🛑</span>
-              <h3 className="font-serif" style={{ color: "#E63946", margin: 0 }}>
+              <h3 className="font-serif" style={{ color: "var(--courtroom-red-bright)", margin: 0 }}>
                 Jurisdictional Exception: Domain Out of Scope
               </h3>
             </div>
@@ -267,7 +290,7 @@ export default function Home() {
                   <div style={{ marginTop: "14px", paddingTop: "12px", borderTop: "1px solid var(--border-hairline)", fontSize: "0.9rem" }}>
                     <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", marginBottom: "10px" }}>
                       <span className="font-mono text-muted">Category: <strong className="text-parchment">{turn.category || "Defective Product"}</strong></span>
-                      <span className="font-mono text-muted">Verdict: <strong style={{ color: turn.judge?.winningSide === "Support" ? "#52B788" : "#F87171" }}>{turn.judge?.winningSide} Favored</strong></span>
+                      <span className="font-mono text-muted">Verdict: <strong style={{ color: turn.judge?.winningSide === "Support" ? "var(--courtroom-green-bright)" : "var(--courtroom-red-bright)" }}>{turn.judge?.winningSide} Favored</strong></span>
                       <span className="font-mono text-muted">Confidence: <strong className="text-brass">{turn.judge?.confidence}%</strong></span>
                     </div>
                     <p style={{ color: "var(--text-parchment)", fontStyle: "italic", margin: 0 }}>
@@ -302,7 +325,7 @@ export default function Home() {
                   <div className="docket-card petitioner-panel">
                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                       <span className="gavel-icon-animated">🟢</span>
-                      <h3 className="font-serif" style={{ color: "#52B788", margin: 0 }}>
+                      <h3 className="font-serif" style={{ color: "var(--courtroom-green-bright)", margin: 0 }}>
                         Petitioner Counsel Filing Arguments...
                       </h3>
                     </div>
@@ -321,7 +344,7 @@ export default function Home() {
                   <div className="docket-card respondent-panel">
                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                       <span className="gavel-icon-animated">🔴</span>
-                      <h3 className="font-serif" style={{ color: "#F87171", margin: 0 }}>
+                      <h3 className="font-serif" style={{ color: "var(--courtroom-red-bright)", margin: 0 }}>
                         Respondent Counsel Preparing Defenses...
                       </h3>
                     </div>

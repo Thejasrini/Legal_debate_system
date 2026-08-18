@@ -23,6 +23,28 @@
   --font-mono: 'IBM Plex Mono', 'JetBrains Mono', monospace;
 }
 
+/* Light Theme Variables */
+[data-theme="light"] {
+  --bg-navy: #F5F3EC;
+  --surface-navy: #FFFFFF;
+  --surface-card: #FAF8F2;
+  --surface-card-hover: #F0ECE1;
+  --accent-brass: #8E6D25;
+  --accent-brass-hover: #75591D;
+  --accent-brass-light: rgba(142, 109, 37, 0.12);
+  --text-parchment: #0F172A;
+  --text-muted: #475569;
+  --text-dim: #64748B;
+  --courtroom-red: #991B1B;
+  --courtroom-red-bright: #DC2626;
+  --courtroom-red-bg: rgba(153, 27, 27, 0.08);
+  --courtroom-green: #166534;
+  --courtroom-green-bright: #16A34A;
+  --courtroom-green-bg: rgba(22, 101, 52, 0.08);
+  --border-hairline: rgba(142, 109, 37, 0.28);
+  --border-hairline-bright: rgba(142, 109, 37, 0.55);
+}
+
 /* Reset & Global Rules */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -38,6 +60,7 @@ html, body {
   line-height: 1.6;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* Scrollbar Styling */
@@ -49,7 +72,7 @@ html, body {
   background: var(--bg-navy);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(201, 169, 97, 0.3);
+  background: rgba(201, 169, 97, 0.4);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
@@ -100,7 +123,7 @@ select:focus-visible {
   border: none;
 }
 
-/* Top Docket Header Bar */
+/* Top Header Bar */
 .docket-topbar {
   background-color: var(--surface-navy);
   border-bottom: 1px solid var(--border-hairline);
@@ -112,6 +135,7 @@ select:focus-visible {
   gap: 12px;
   font-family: var(--font-mono);
   font-size: 0.85rem;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .docket-title-group {
@@ -156,13 +180,13 @@ select:focus-visible {
 
 .docket-status-pill.verdict {
   background-color: var(--courtroom-green-bg);
-  color: #52B788;
+  color: #16A34A;
   border: 1px solid var(--courtroom-green-bright);
 }
 
 .docket-status-pill.out-of-scope {
   background-color: var(--courtroom-red-bg);
-  color: #E63946;
+  color: #DC2626;
   border: 1px solid var(--courtroom-red);
 }
 
@@ -189,6 +213,10 @@ select:focus-visible {
   align-items: center;
   gap: 8px;
   letter-spacing: 0.3px;
+}
+
+[data-theme="light"] .btn-brass {
+  color: #FFFFFF;
 }
 
 .btn-brass:hover:not(:disabled) {
@@ -221,6 +249,28 @@ select:focus-visible {
   background-color: var(--accent-brass-light);
 }
 
+/* Theme Switcher Button */
+.btn-theme-toggle {
+  background-color: var(--surface-card);
+  color: var(--text-parchment);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border: 1px solid var(--border-hairline);
+  border-radius: 20px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-theme-toggle:hover {
+  border-color: var(--accent-brass);
+  color: var(--accent-brass);
+}
+
 /* Card Surfaces */
 .docket-card {
   background-color: var(--surface-navy);
@@ -228,6 +278,7 @@ select:focus-visible {
   border-radius: 6px;
   padding: 20px;
   position: relative;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 /* Facing Agent Cards */
@@ -267,7 +318,7 @@ select:focus-visible {
   display: inline-block;
   border: 3px double var(--accent-brass);
   color: var(--accent-brass);
-  background-color: rgba(18, 25, 43, 0.95);
+  background-color: var(--surface-navy);
   font-family: var(--font-serif);
   font-size: 1.3rem;
   font-weight: 800;

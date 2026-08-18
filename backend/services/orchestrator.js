@@ -86,7 +86,7 @@ export async function runDebate(question, customContext = "", onEvent = null, hi
         ? `${question} ${history.map(t => t.question).slice(-2).join(" ")}`
         : question;
 
-      const relevantSections = await retrieveRelevantSections(ragSearchQuery, 3);
+      const relevantSections = await retrieveRelevantSections(ragSearchQuery, 4);
       if (relevantSections && relevantSections.length > 0) {
         context = relevantSections
           .map((r) => `[${r.metadata.section} - ${r.metadata.title} (Page ${r.metadata.page})]\n${r.text}`)
