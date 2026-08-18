@@ -1,20 +1,32 @@
 import { runDebate } from "../services/orchestrator.js";
 
 async function main() {
-  const question = "A consumer ordered a mobile phone through Flipkart but never received it. What remedies may be available under the Consumer Protection Act, 2019?";
+  const inScopeQ = "A consumer purchased a defective refrigerator that stopped working within 2 days. The store refused to refund or replace it. What remedies are available under the Consumer Protection Act, 2019?";
+  const outOfScopeQ = "What is the legal punishment for criminal murder and robbery under the Indian Penal Code?";
 
-  console.log("🚀 EXECUTING GROUNDED LEXAGENT COURTROOM DEBATE...");
-  console.log(`Question: "${question}"\n`);
+  console.log("==================================================");
+  console.log("TEST 1: IN-SCOPE QUESTION (Defective Product Refund)");
+  console.log(`"${inScopeQ}"`);
+  console.log("==================================================\n");
 
-  const result = await runDebate(question);
+  const inScopeResult = await runDebate(inScopeQ);
 
-  console.log("==========================================");
-  console.log("FULL GROUNDED DEBATE RESULT");
-  console.log("==========================================");
-  console.log(JSON.stringify(result, null, 2));
-  console.log("==========================================\n");
+  console.log("\n==================================================");
+  console.log("TEST 2: OUT-OF-SCOPE QUESTION (Criminal IPC Matter)");
+  console.log(`"${outOfScopeQ}"`);
+  console.log("==================================================\n");
+
+  const outOfScopeResult = await runDebate(outOfScopeQ);
+
+  console.log("==================================================");
+  console.log("CLASSIFIER & DOMAIN SCOPE VERIFICATION RESULT");
+  console.log("==================================================");
+  console.log("IN-SCOPE RESULT:\n", JSON.stringify(inScopeResult, null, 2));
+  console.log("\n--------------------------------------------------\n");
+  console.log("OUT-OF-SCOPE RESULT (Short-Circuited Response):\n", JSON.stringify(outOfScopeResult, null, 2));
+  console.log("==================================================\n");
 }
 
 main().catch((err) => {
-  console.error("❌ Debate test failed:", err);
+  console.error("❌ Test failed:", err);
 });

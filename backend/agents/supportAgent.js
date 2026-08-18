@@ -7,10 +7,23 @@ import { safeParseJSON } from "../utils/jsonHelper.js";
  * 
  * @param {string} question The user's legal question or case facts.
  * @param {string} context The retrieved legal text chunks from ChromaDB.
+ * @param {Array} history Optional prior conversation turns in the current thread.
  * @returns {Promise<object>} Structured JSON object for Support Agent.
  */
-export async function supportAgent(question, context = "") {
-  // Debug output before calling Gemini
+export async function supportAgent(question, context = "", history = []) {
+  // Build Prior History Section if available
+  const historySection = Array.isArray(history) && history.length > 0
+    ? `
+========================================
+PRIOR CONVERSATION HISTORY (Current Case Thread)
+========================================
+${history.map((t, idx) => `Turn ${idx + 1}:
+Q: ${t.question}
+Judge Verdict / Decision: ${t.judge?.decision || "N/A"}`).join("\n\n")}
+========================================
+`
+    : "";
+
   console.log("========================================");
   console.log("SUPPORT AGENT RAG CONTEXT");
   console.log("========================================");
@@ -22,7 +35,7 @@ ROLE & GROUNDING MANDATE:
 You are the Support Agent for the CONSUMER / COMPLAINANT.
 You must argue for the consumer using ONLY the retrieved legal context.
 You MUST NOT invent legal rules, e-commerce rules, IT Act safe harbour, burden-of-proof rules, contractual terms, or case law unless explicitly present in RETRIEVED_CONTEXT.
-
+${historySection}
 USER QUESTION / CASE FACTS:
 ${question}
 
@@ -35,70 +48,72 @@ RULES:
    - What can reasonably be inferred: State clearly as factual application.
    - What is not established: Mark explicitly as "Not established by retrieved legal material."
 2. DO NOT CLAIM REMEDIES ARE AUTOMATIC:
-   - Use phrasing such as: "Section 39(1)(c) expressly provides that the District Commission may direct return of the price or charges paid, along with such interest as may be decided, where statutory conditions are satisfied."
+   - Use phrasing such as: "Section X expressly provides that the District Commission may direct..."
    - Do NOT say "refund is guaranteed" or "non-delivery automatically constitutes deficiency".
-3. CITATION DISCIPLINE:
+3. CONVERSATION CONTINUITY:
+   - If prior conversation history is provided above, address the new question as a continuation of the same ongoing legal matter while remaining strictly grounded in RETRIEVED_CONTEXT.
+4. CITATION DISCIPLINE:
    - Every legal argument must include a "legalBasis" array with:
-     - "section": Exact section/subsection (e.g., "Section 39(1)(c)")
+     - "section": Exact section/subsection from RETRIEVED_CONTEXT
      - "title": Section title from text
      - "source": "Consumer Protection Act, 2019"
      - "page": Integer page number
 
+The JSON structure below is a SCHEMA TEMPLATE ONLY. Every value must be freshly generated from the RETRIEVED_CONTEXT and USER QUESTION above -- do not reuse any specific wording, section numbers, or scores from this template itself.
+
 Return ONLY a valid JSON object matching this EXACT structure (no code fences, no markdown):
 
 {
-  "position": "Based on the retrieved material, the consumer alleges non-delivery/defect. Section 39(1) of the Consumer Protection Act, 2019 provides that where the District Commission is satisfied that allegations or defects are proved, specified remedies may be ordered.",
+  "position": "<one sentence stating the consumer position, grounded strictly in RETRIEVED_CONTEXT for THIS question>",
   "keyArguments": [
     {
-      "argument": "Section 39(1) provides that where the District Commission is satisfied that the goods complained against suffer from any of the defects specified in the complaint or claims for compensation are proved, it may issue an order directing one or more specified remedies.",
-      "status": "EXPLICITLY SUPPORTED",
+      "argument": "<an argument text that cites a specific section number actually present in RETRIEVED_CONTEXT above -- do not reuse example section numbers>",
+      "status": "<EXPLICITLY SUPPORTED | INFERRED | UNSUPPORTED BY RETRIEVED LEGAL MATERIAL>",
       "legalBasis": [
         {
-          "section": "Section 39(1)",
-          "title": "Findings of District Commission",
+          "section": "<exact section from RETRIEVED_CONTEXT>",
+          "title": "<its title>",
           "source": "Consumer Protection Act, 2019",
-          "page": 26
+          "page": <integer page number>
         }
       ]
     }
   ],
   "legalBasis": [
     {
-      "section": "Section 39(1)",
-      "title": "Findings of District Commission",
+      "section": "<exact section from RETRIEVED_CONTEXT>",
+      "title": "<its title>",
       "source": "Consumer Protection Act, 2019",
-      "page": 26
+      "page": <integer page number>
     }
   ],
   "evidenceNeeded": [
-    "Proof of purchase showing the item was ordered and paid for",
-    "Evidence establishing non-delivery or defect"
+    "<specific evidence item needed to prove the claim>"
   ],
   "possibleRemedies": [
     {
-      "remedy": "Section 39(1)(c) expressly provides that the District Commission may direct return of the price paid along with such interest as may be decided, where statutory conditions are satisfied.",
-      "status": "EXPLICITLY SUPPORTED",
+      "remedy": "<statutory remedy description citing a specific section from RETRIEVED_CONTEXT>",
+      "status": "<EXPLICITLY SUPPORTED | INFERRED | UNSUPPORTED BY RETRIEVED LEGAL MATERIAL>",
       "legalBasis": [
         {
-          "section": "Section 39(1)(c)",
-          "title": "Findings of District Commission",
+          "section": "<exact section from RETRIEVED_CONTEXT>",
+          "title": "<its title>",
           "source": "Consumer Protection Act, 2019",
-          "page": 26
+          "page": <integer page number>
         }
       ]
     }
   ],
   "unsupportedClaims": [
-    "Not established by retrieved legal material: specific e-commerce platform liabilities, Flipkart delivery rules, or automatic deficiency classifications."
+    "<any consumer claim or assertion that is NOT established by RETRIEVED_CONTEXT>"
   ],
-  "strength": 75
+  "strength": <integer 0-100, calculated per the RULES above based on how well RETRIEVED_CONTEXT supports this side -- do not default to a fixed number>
 }
 `;
 
   const result = await generateContentWithRetry(prompt);
   const parsedJSON = safeParseJSON(result.response.text());
 
-  // Debug output after Gemini responds
   console.log("========================================");
   console.log("SUPPORT AGENT STRUCTURED OUTPUT");
   console.log("========================================");

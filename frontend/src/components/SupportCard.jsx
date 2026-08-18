@@ -3,9 +3,13 @@ export default function SupportCard({ data }) {
 
   if (typeof data === "string") {
     return (
-      <div className="card support-card">
-        <h2>🟢 SUPPORT - Consumer Counsel</h2>
-        <p>{data}</p>
+      <div className="docket-card petitioner-panel">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+          <h3 className="font-serif" style={{ color: "var(--courtroom-green-bright)", fontSize: "1.1rem" }}>
+            ⚖️ PETITIONER AI (Consumer Counsel)
+          </h3>
+        </div>
+        <p style={{ color: "var(--text-parchment)" }}>{data}</p>
       </div>
     );
   }
@@ -19,23 +23,23 @@ export default function SupportCard({ data }) {
 
       return (
         <div>
-          <div>{textContent}</div>
+          <div style={{ color: "var(--text-parchment)", marginBottom: "4px" }}>{textContent}</div>
           {basisList.length > 0 && (
-            <div style={{ marginTop: "6px", display: "flex", flexWrap: "wrap", gap: "6px" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "4px" }}>
               {basisList.map((basis, idx) => (
                 <span
                   key={idx}
+                  className="font-mono"
                   style={{
-                    backgroundColor: "#e8f5e9",
-                    color: "#1b5e20",
-                    padding: "3px 8px",
+                    backgroundColor: "rgba(46, 92, 78, 0.25)",
+                    color: "#52B788",
+                    padding: "2px 8px",
                     borderRadius: "4px",
-                    border: "1px solid #c8e6c9",
-                    fontSize: "0.82rem",
-                    fontWeight: "600"
+                    border: "1px solid rgba(82, 183, 136, 0.4)",
+                    fontSize: "0.78rem"
                   }}
                 >
-                  📜 {basis.section || "Section"} ({basis.title || "CPA 2019"}{basis.page ? `, Page ${basis.page}` : ""})
+                  📜 {basis.section || "Section"} ({basis.title || "CPA 2019"}{basis.page ? `, p.${basis.page}` : ""})
                 </span>
               ))}
             </div>
@@ -47,31 +51,54 @@ export default function SupportCard({ data }) {
   };
 
   return (
-    <div className="card support-card">
-      <h2>🟢 SUPPORT (Consumer Counsel)</h2>
+    <div className="docket-card petitioner-panel">
+      {/* Panel Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", paddingBottom: "10px", borderBottom: "1px solid var(--border-hairline)" }}>
+        <h3 className="font-serif" style={{ color: "#52B788", fontSize: "1.15rem", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+          <span>🟢</span> PETITIONER COUNSEL
+        </h3>
+        {data.strength !== undefined && (
+          <span className="font-mono" style={{ backgroundColor: "rgba(46, 92, 78, 0.3)", color: "#52B788", padding: "3px 10px", borderRadius: "12px", fontSize: "0.8rem", border: "1px solid rgba(82, 183, 136, 0.4)" }}>
+            CLAIM STRENGTH: {data.strength}%
+          </span>
+        )}
+      </div>
 
+      {/* Position */}
       {data.position && (
-        <div>
-          <h3>Position</h3>
-          <p>{data.position}</p>
+        <div style={{ marginBottom: "16px" }}>
+          <div className="font-mono text-muted" style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+            Factual & Legal Position
+          </div>
+          <p style={{ fontSize: "0.95rem", color: "var(--text-parchment)", fontStyle: "italic", lineHeight: "1.5" }}>
+            "{data.position}"
+          </p>
         </div>
       )}
 
+      {/* Key Arguments */}
       {data.keyArguments && data.keyArguments.length > 0 && (
-        <div>
-          <h3>Key Arguments</h3>
-          <ul>
+        <div style={{ marginBottom: "16px" }}>
+          <div className="font-mono text-muted" style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
+            Key Statutory Arguments
+          </div>
+          <ul style={{ paddingLeft: "18px", margin: 0, display: "flex", flexDirection: "column", gap: "10px" }}>
             {data.keyArguments.map((arg, i) => (
-              <li key={i}>{renderItemWithBasis(arg, "argument")}</li>
+              <li key={i} style={{ color: "var(--text-parchment)" }}>
+                {renderItemWithBasis(arg, "argument")}
+              </li>
             ))}
           </ul>
         </div>
       )}
 
+      {/* Evidence Needed */}
       {data.evidenceNeeded && data.evidenceNeeded.length > 0 && (
-        <div>
-          <h3>Evidence Needed</h3>
-          <ul>
+        <div style={{ marginBottom: "16px" }}>
+          <div className="font-mono text-muted" style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
+            Evidentiary Burden
+          </div>
+          <ul style={{ paddingLeft: "18px", margin: 0, fontSize: "0.9rem", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "4px" }}>
             {data.evidenceNeeded.map((ev, i) => (
               <li key={i}>{typeof ev === "string" ? ev : JSON.stringify(ev)}</li>
             ))}
@@ -79,33 +106,33 @@ export default function SupportCard({ data }) {
         </div>
       )}
 
+      {/* Possible Remedies */}
       {data.possibleRemedies && data.possibleRemedies.length > 0 && (
-        <div>
-          <h3>Possible Remedies</h3>
-          <ul>
+        <div style={{ marginBottom: "16px" }}>
+          <div className="font-mono text-muted" style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
+            Statutory Relief Sought
+          </div>
+          <ul style={{ paddingLeft: "18px", margin: 0, display: "flex", flexDirection: "column", gap: "8px" }}>
             {data.possibleRemedies.map((rem, i) => (
-              <li key={i}>{renderItemWithBasis(rem, "remedy")}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {data.unsupportedClaims && data.unsupportedClaims.length > 0 && (
-        <div style={{ marginTop: "14px", padding: "10px", backgroundColor: "#fffde7", borderRadius: "6px", border: "1px solid #fff59d" }}>
-          <h3 style={{ color: "#f57f17", margin: "0 0 6px 0", fontSize: "0.95rem" }}>⚠️ Unsupported Claims / Limits</h3>
-          <ul style={{ margin: 0, paddingLeft: "18px" }}>
-            {data.unsupportedClaims.map((claim, i) => (
-              <li key={i} style={{ color: "#5d4037", fontSize: "0.9rem" }}>
-                {typeof claim === "string" ? claim : JSON.stringify(claim)}
+              <li key={i} style={{ color: "var(--text-parchment)" }}>
+                {renderItemWithBasis(rem, "remedy")}
               </li>
             ))}
           </ul>
         </div>
       )}
 
-      {data.strength !== undefined && (
-        <div style={{ marginTop: "15px", fontWeight: "bold" }}>
-          Strength: {data.strength}%
+      {/* Unsupported Claims */}
+      {data.unsupportedClaims && data.unsupportedClaims.length > 0 && (
+        <div style={{ marginTop: "14px", padding: "10px 14px", backgroundColor: "rgba(139, 46, 46, 0.12)", borderRadius: "4px", border: "1px solid rgba(139, 46, 46, 0.3)" }}>
+          <div className="font-mono" style={{ color: "#E63946", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+            ⚠️ Claim Limits / Unretrieved Context
+          </div>
+          <ul style={{ margin: 0, paddingLeft: "16px", fontSize: "0.85rem", color: "var(--text-muted)" }}>
+            {data.unsupportedClaims.map((claim, i) => (
+              <li key={i}>{typeof claim === "string" ? claim : JSON.stringify(claim)}</li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
